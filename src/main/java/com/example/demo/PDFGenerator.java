@@ -19,64 +19,288 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 public class PDFGenerator {
-	
-	
-	public static ByteArrayInputStream usersPDFReport(List<User> users) {
+
+	public static ByteArrayInputStream usersPDFReport(List<StaReport> reports) {
 		Document document = new Document();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        
-        try {
-        	
-        	PdfWriter.getInstance(document, out);
-            document.open();
-        	
-			// Add Text to PDF file ->
-			Font font = FontFactory.getFont(FontFactory.COURIER, 18, BaseColor.BLUE);
-			Paragraph para = new Paragraph( "Users List", font);
-			para.setAlignment(Element.ALIGN_CENTER);
-			document.add(para);
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-			document.add(Chunk.NEWLINE);
-        	
-        	PdfPTable table = new PdfPTable(3);
-        	// Add PDF Table Header ->
-			Stream.of("ID", "First Name", "Last Name")
-			    .forEach(headerTitle -> {
-			          PdfPCell header = new PdfPCell();
-			          Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
-			          header.setBackgroundColor(BaseColor.LIGHT_GRAY);
-			          header.setHorizontalAlignment(Element.ALIGN_CENTER);
-			          header.setBorderWidth(2);
-			          header.setPhrase(new Phrase(headerTitle, headFont));
-			          table.addCell(header);
-			    });
-            
-            for (User user : users) {
-            	PdfPCell idCell = new PdfPCell(new Phrase(user.getId().toString()));
-            	idCell.setPaddingLeft(4);
-            	idCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            	idCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                table.addCell(idCell);
+		try {
 
-                PdfPCell firstNameCell = new PdfPCell(new Phrase(user.getFirstName()));
-                firstNameCell.setPaddingLeft(4);
-                firstNameCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-                firstNameCell.setHorizontalAlignment(Element.ALIGN_LEFT);
-                table.addCell(firstNameCell);
+			PdfWriter.getInstance(document, out);
+			document.open();
 
-                PdfPCell lastNameCell = new PdfPCell(new Phrase(String.valueOf(user.getLastName())));
-                lastNameCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-                lastNameCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                lastNameCell.setPaddingRight(4);
-                table.addCell(lastNameCell);
-            }
-            document.add(table);
-            
-            document.close();
-        }catch(DocumentException e) {
-        	System.out.println(e.toString());
-        }
-        
+			for (StaReport staReport : reports) {
+				// Add Text to PDF file ->
+
+				Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, BaseColor.BLUE);
+				Paragraph para = new Paragraph("SUPERVISOR TRADE APPROVAL Report", font);
+				para.setAlignment(Element.ALIGN_CENTER);
+				document.add(para);
+				document.add(Chunk.NEWLINE);
+
+				font = FontFactory.getFont(FontFactory.COURIER, 14, BaseColor.BLACK);
+				para = new Paragraph("STA STATUS: " + staReport.getStatus(), font);
+				para.setAlignment(Element.ALIGN_RIGHT);
+				document.add(para);
+				font = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.BLACK);
+				para = new Paragraph("Trade Information", font);
+				para.setAlignment(Element.ALIGN_LEFT);
+				document.add(para);
+				document.add(designTradeInfromation(staReport));
+
+				document.add(Chunk.NEWLINE);
+
+				para = new Paragraph("Trade Details", font);
+				para.setAlignment(Element.ALIGN_LEFT);
+				document.add(para);
+				document.add(designTradeDetails(staReport));
+
+				document.add(Chunk.NEWLINE);
+
+				para = new Paragraph("RR Rotationale", font);
+				para.setAlignment(Element.ALIGN_LEFT);
+				document.add(para);
+				document.add(designRrRotaionale(staReport));
+
+				document.add(Chunk.NEWLINE);
+
+				para = new Paragraph("Justification for Approval", font);
+				para.setAlignment(Element.ALIGN_LEFT);
+				document.add(para);
+				document.add(designApproval(staReport));
+
+				document.add(Chunk.NEWLINE);
+
+				para = new Paragraph("AuditTrail", font);
+				para.setAlignment(Element.ALIGN_LEFT);
+				document.add(para);
+				document.add(designAuidtTrail(staReport));
+				
+				document.add(Chunk.NEXTPAGE);
+
+			}
+
+			document.close();
+		} catch (DocumentException e) {
+			System.out.println(e.toString());
+		}
+
 		return new ByteArrayInputStream(out.toByteArray());
+	}
+
+	public static PdfPTable designTradeInfromation(StaReport staReport) {
+		PdfPTable tradeInfromation = new PdfPTable(3);
+
+		Stream.of("Client Name", "MDM ID", "Broakarage Account Number").forEach(headerTitle -> {
+			PdfPCell header = new PdfPCell();
+			Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+			header.setHorizontalAlignment(Element.ALIGN_CENTER);
+			header.setBorderWidth(0);
+			header.setPhrase(new Phrase(headerTitle, headFont));
+			tradeInfromation.addCell(header);
+		});
+		PdfPCell clientNameCell = new PdfPCell(new Phrase(staReport.getClientName()));
+		clientNameCell.setPaddingLeft(4);
+		clientNameCell.setBorderWidth(0);
+		clientNameCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		clientNameCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+		tradeInfromation.addCell(clientNameCell);
+
+		PdfPCell mdmIdCell = new PdfPCell(new Phrase(staReport.getMdmId()));
+		mdmIdCell.setPaddingLeft(4);
+		mdmIdCell.setBorderWidth(0);
+		mdmIdCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		mdmIdCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+		tradeInfromation.addCell(mdmIdCell);
+
+		PdfPCell brAccountCell = new PdfPCell(new Phrase(String.valueOf(staReport.getBrokarageAccount())));
+		brAccountCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		brAccountCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+		brAccountCell.setBorderWidth(0);
+		brAccountCell.setPaddingRight(4);
+		tradeInfromation.addCell(brAccountCell);
+		return tradeInfromation;
+	}
+
+	public static PdfPTable designTradeDetails(StaReport staReport) {
+		PdfPTable designAuidtTrail = new PdfPTable(5);
+
+		// Add PDF Table Header ->
+		Stream.of("Type of Trade", "Type of Praposal", "Secuirty Name", "Trade Amount", "Type of Funds")
+				.forEach(headerTitle -> {
+					PdfPCell header = new PdfPCell();
+					Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+					header.setPaddingBottom(5);
+					header.setBackgroundColor(BaseColor.LIGHT_GRAY);
+					header.setHorizontalAlignment(Element.ALIGN_CENTER);
+					header.setBorderWidth(1);
+					header.setPhrase(new Phrase(headerTitle, headFont));
+					designAuidtTrail.addCell(header);
+				});
+
+		for (TradeDetails trade : staReport.getTradeDetails()) {
+			PdfPCell typeCell = new PdfPCell(new Phrase(trade.getTypeofTrade()));
+			typeCell.setPaddingLeft(4);
+			typeCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			typeCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			designAuidtTrail.addCell(typeCell);
+
+			PdfPCell praposalCell = new PdfPCell(new Phrase(trade.getTypeofPraposal()));
+			praposalCell.setPaddingLeft(4);
+			praposalCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			praposalCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+			designAuidtTrail.addCell(praposalCell);
+
+			PdfPCell secuirtyCell = new PdfPCell(new Phrase(String.valueOf(trade.getSecuirtyName())));
+			secuirtyCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			secuirtyCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+			secuirtyCell.setPaddingRight(4);
+			designAuidtTrail.addCell(secuirtyCell);
+
+			PdfPCell amountCell = new PdfPCell(new Phrase(String.valueOf(trade.getTradeamound())));
+			amountCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			amountCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+			amountCell.setPaddingRight(4);
+			designAuidtTrail.addCell(amountCell);
+
+			PdfPCell fundCell = new PdfPCell(new Phrase(String.valueOf(trade.getTradefunds())));
+			fundCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			fundCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+			fundCell.setPaddingRight(4);
+			designAuidtTrail.addCell(fundCell);
+		}
+		return designAuidtTrail;
+	}
+
+	public static PdfPTable designAuidtTrail(StaReport staReport) {
+		PdfPTable designAuidtTrail = new PdfPTable(5);
+
+		// Add PDF Table Header ->
+		Stream.of("Updated By", "Status", "Description", "comment", "updated time").forEach(headerTitle -> {
+			PdfPCell header = new PdfPCell();
+			Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+			header.setBackgroundColor(BaseColor.LIGHT_GRAY);
+			header.setHorizontalAlignment(Element.ALIGN_CENTER);
+			header.setBorderWidth(2);
+			header.setPhrase(new Phrase(headerTitle, headFont));
+			designAuidtTrail.addCell(header);
+		});
+
+		for (AuditTrail audit : staReport.getAuditTrail()) {
+			PdfPCell updatedByCell = new PdfPCell(new Phrase(audit.getUpdatedBy()));
+			updatedByCell.setPaddingLeft(4);
+			updatedByCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			updatedByCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			designAuidtTrail.addCell(updatedByCell);
+
+			PdfPCell statusCell = new PdfPCell(new Phrase(audit.getStatus()));
+			statusCell.setPaddingLeft(4);
+			statusCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			statusCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+			designAuidtTrail.addCell(statusCell);
+
+			PdfPCell descriptionCell = new PdfPCell(new Phrase(String.valueOf(audit.getDescription())));
+			descriptionCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			descriptionCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+			descriptionCell.setPaddingRight(4);
+			designAuidtTrail.addCell(descriptionCell);
+
+			PdfPCell commentsCell = new PdfPCell(new Phrase(String.valueOf(audit.getComment())));
+			commentsCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			commentsCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+			commentsCell.setPaddingRight(4);
+			designAuidtTrail.addCell(commentsCell);
+
+			PdfPCell updateTimeCell = new PdfPCell(new Phrase(String.valueOf(audit.getUpdatedTime())));
+			updateTimeCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			updateTimeCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+			updateTimeCell.setPaddingRight(4);
+			designAuidtTrail.addCell(updateTimeCell);
+		}
+		return designAuidtTrail;
+	}
+
+	public static PdfPTable designApproval(StaReport staReport) {
+		PdfPTable designApproval = new PdfPTable(1);
+		Stream.of("First Approval/Rejection").forEach(headerTitle -> {
+			PdfPCell header = new PdfPCell();
+			Font headFont = FontFactory.getFont(FontFactory.COURIER, 14);
+			header.setHorizontalAlignment(Element.ALIGN_LEFT);
+			header.setBorderWidth(0);
+			header.setPhrase(new Phrase(headerTitle, headFont));
+			designApproval.addCell(header);
+		});
+		Font cellFont = FontFactory.getFont(FontFactory.COURIER, 14);
+
+		PdfPCell designApproval1 = new PdfPCell(new Phrase(String.valueOf(staReport.getFirstComments())));
+		designApproval1.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		designApproval1.setHorizontalAlignment(Element.ALIGN_CENTER);
+		designApproval1.setBorderWidth(1);
+		designApproval.addCell(designApproval1);
+
+		PdfPCell designApproval2 = new PdfPCell(new Phrase(String.valueOf("Second Approval/Rejection"), cellFont));
+		designApproval2.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		designApproval2.setHorizontalAlignment(Element.ALIGN_LEFT);
+		designApproval2.setBorderWidth(0);
+		designApproval2.setPaddingRight(4);
+		designApproval.addCell(designApproval2);
+
+		PdfPCell designApproval3 = new PdfPCell(new Phrase(String.valueOf(staReport.getSecondComments())));
+		designApproval3.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		designApproval3.setHorizontalAlignment(Element.ALIGN_CENTER);
+		designApproval3.setBorderWidth(1);
+		designApproval3.setPaddingRight(4);
+		designApproval.addCell(designApproval3);
+
+		return designApproval;
+	}
+
+	public static PdfPTable designRrRotaionale(StaReport staReport) {
+		PdfPTable rrTationale = new PdfPTable(1);
+		Stream.of("New Account Transaction").forEach(headerTitle -> {
+			PdfPCell header = new PdfPCell();
+			Font headFont = FontFactory.getFont(FontFactory.COURIER, 14);
+			header.setHorizontalAlignment(Element.ALIGN_LEFT);
+			header.setBorderWidth(0);
+			header.setPhrase(new Phrase(headerTitle, headFont));
+			rrTationale.addCell(header);
+		});
+		Font cellFont = FontFactory.getFont(FontFactory.COURIER, 14);
+
+		PdfPCell rrTationale1 = new PdfPCell(new Phrase(String.valueOf(staReport.getPrincipleApproval())));
+		rrTationale1.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		rrTationale1.setHorizontalAlignment(Element.ALIGN_CENTER);
+		rrTationale1.setBorderWidth(1);
+		rrTationale1.setPaddingRight(4);
+		rrTationale.addCell(rrTationale1);
+
+		PdfPCell rrTationale2 = new PdfPCell(new Phrase(String.valueOf("If New Account/Transaction"), cellFont));
+		rrTationale2.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		rrTationale2.setHorizontalAlignment(Element.ALIGN_LEFT);
+		rrTationale2.setBorderWidth(0);
+		rrTationale2.setPaddingRight(4);
+		rrTationale.addCell(rrTationale2);
+
+		PdfPCell rrTationale3 = new PdfPCell(new Phrase(String.valueOf(staReport.getReasonForApproval())));
+		rrTationale3.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		rrTationale3.setHorizontalAlignment(Element.ALIGN_CENTER);
+		rrTationale3.setBorderWidth(1);
+		rrTationale3.setPaddingRight(4);
+		rrTationale.addCell(rrTationale3);
+
+		PdfPCell rrTationale4 = new PdfPCell(new Phrase(String.valueOf("Non retirment Account/Transaction"), cellFont));
+		rrTationale4.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		rrTationale4.setHorizontalAlignment(Element.ALIGN_LEFT);
+		rrTationale4.setBorderWidth(0);
+		rrTationale4.setPaddingRight(4);
+		rrTationale.addCell(rrTationale4);
+
+		PdfPCell rrTationale5 = new PdfPCell(new Phrase(String.valueOf(staReport.getNsdApproval())));
+		rrTationale5.setVerticalAlignment(Element.ALIGN_MIDDLE);
+		rrTationale5.setHorizontalAlignment(Element.ALIGN_CENTER);
+		rrTationale5.setBorderWidth(1);
+		rrTationale5.setPaddingRight(4);
+		rrTationale.addCell(rrTationale5);
+		return rrTationale;
 	}
 }
