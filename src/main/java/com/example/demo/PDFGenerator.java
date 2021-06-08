@@ -20,15 +20,27 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 public class PDFGenerator {
 
+	public static void addParagraph(String fontName, Float fintSize, BaseColor color, String text, Document document,
+			int alignment) throws DocumentException {
+		Paragraph para = new Paragraph(text, FontFactory.getFont(fontName, fintSize, color));
+		para.setAlignment(alignment);
+		document.add(para);
+
+	}
+
 	public static ByteArrayInputStream usersPDFReport(List<StaReport> reports) {
 		Document document = new Document();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
 		try {
 
+			CallReport callReportData = new CallReport();
+			
 			PdfWriter.getInstance(document, out);
 			document.open();
 
+			CallReportsPrint.callReport(callReportData,document);
+			
 			for (StaReport staReport : reports) {
 				// Add Text to PDF file ->
 
@@ -57,10 +69,7 @@ public class PDFGenerator {
 
 				document.add(Chunk.NEWLINE);
 
-				para = new Paragraph("RR Rotationale", font);
-				para.setAlignment(Element.ALIGN_LEFT);
-				document.add(para);
-				document.add(designRrRotaionale(staReport));
+				designRrRotaionale(staReport, document);
 
 				document.add(Chunk.NEWLINE);
 
@@ -75,7 +84,7 @@ public class PDFGenerator {
 				para.setAlignment(Element.ALIGN_LEFT);
 				document.add(para);
 				document.add(designAuidtTrail(staReport));
-				
+
 				document.add(Chunk.NEXTPAGE);
 
 			}
@@ -255,52 +264,27 @@ public class PDFGenerator {
 		return designApproval;
 	}
 
-	public static PdfPTable designRrRotaionale(StaReport staReport) {
-		PdfPTable rrTationale = new PdfPTable(1);
-		Stream.of("New Account Transaction").forEach(headerTitle -> {
-			PdfPCell header = new PdfPCell();
-			Font headFont = FontFactory.getFont(FontFactory.COURIER, 14);
-			header.setHorizontalAlignment(Element.ALIGN_LEFT);
-			header.setBorderWidth(0);
-			header.setPhrase(new Phrase(headerTitle, headFont));
-			rrTationale.addCell(header);
-		});
-		Font cellFont = FontFactory.getFont(FontFactory.COURIER, 14);
+	public static void designRrRotaionale(StaReport staReport, Document document) throws DocumentException {
+		addParagraph(FontFactory.HELVETICA_BOLD, (float) 18, BaseColor.BLACK, "RR Rotationale", document,
+				Element.ALIGN_LEFT);
 
-		PdfPCell rrTationale1 = new PdfPCell(new Phrase(String.valueOf(staReport.getPrincipleApproval())));
-		rrTationale1.setVerticalAlignment(Element.ALIGN_MIDDLE);
-		rrTationale1.setHorizontalAlignment(Element.ALIGN_CENTER);
-		rrTationale1.setBorderWidth(1);
-		rrTationale1.setPaddingRight(4);
-		rrTationale.addCell(rrTationale1);
+		addParagraph(FontFactory.HELVETICA_BOLD, (float) 12, BaseColor.BLACK, "New Account Transaction", document,
+				Element.ALIGN_LEFT);
 
-		PdfPCell rrTationale2 = new PdfPCell(new Phrase(String.valueOf("If New Account/Transaction"), cellFont));
-		rrTationale2.setVerticalAlignment(Element.ALIGN_MIDDLE);
-		rrTationale2.setHorizontalAlignment(Element.ALIGN_LEFT);
-		rrTationale2.setBorderWidth(0);
-		rrTationale2.setPaddingRight(4);
-		rrTationale.addCell(rrTationale2);
+		addParagraph(FontFactory.HELVETICA, (float) 12, BaseColor.BLACK, staReport.getPrincipleApproval(), document,
+				Element.ALIGN_LEFT);
 
-		PdfPCell rrTationale3 = new PdfPCell(new Phrase(String.valueOf(staReport.getReasonForApproval())));
-		rrTationale3.setVerticalAlignment(Element.ALIGN_MIDDLE);
-		rrTationale3.setHorizontalAlignment(Element.ALIGN_CENTER);
-		rrTationale3.setBorderWidth(1);
-		rrTationale3.setPaddingRight(4);
-		rrTationale.addCell(rrTationale3);
+		addParagraph(FontFactory.HELVETICA_BOLD, (float) 12, BaseColor.BLACK, "If New Account/Transaction", document,
+				Element.ALIGN_LEFT);
 
-		PdfPCell rrTationale4 = new PdfPCell(new Phrase(String.valueOf("Non retirment Account/Transaction"), cellFont));
-		rrTationale4.setVerticalAlignment(Element.ALIGN_MIDDLE);
-		rrTationale4.setHorizontalAlignment(Element.ALIGN_LEFT);
-		rrTationale4.setBorderWidth(0);
-		rrTationale4.setPaddingRight(4);
-		rrTationale.addCell(rrTationale4);
+		addParagraph(FontFactory.HELVETICA, (float) 12, BaseColor.BLACK, staReport.getReasonForApproval(), document,
+				Element.ALIGN_LEFT);
 
-		PdfPCell rrTationale5 = new PdfPCell(new Phrase(String.valueOf(staReport.getNsdApproval())));
-		rrTationale5.setVerticalAlignment(Element.ALIGN_MIDDLE);
-		rrTationale5.setHorizontalAlignment(Element.ALIGN_CENTER);
-		rrTationale5.setBorderWidth(1);
-		rrTationale5.setPaddingRight(4);
-		rrTationale.addCell(rrTationale5);
-		return rrTationale;
+		addParagraph(FontFactory.HELVETICA_BOLD, (float) 12, BaseColor.BLACK, "Non retirment Account/Transaction",
+				document, Element.ALIGN_LEFT);
+
+		addParagraph(FontFactory.HELVETICA, (float) 12, BaseColor.BLACK, staReport.getNsdApproval(), document,
+				Element.ALIGN_LEFT);
+
 	}
 }

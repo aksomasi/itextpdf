@@ -42,7 +42,7 @@ public class TimeOutController {
 
 			StaReport staReport = new StaReport();
 			staReport.setClientName("Mr. " + generatedString);
-			staReport.setMdmId("17739972_"+i);
+			staReport.setMdmId("17739972_" + i);
 			staReport.setBrokarageAccount("69PW123456");
 			staReport.setStatus("Approved");
 			staReport.setFirstComments("test");
@@ -68,7 +68,7 @@ public class TimeOutController {
 					new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date())));
 
 			staReport.setAuditTrail(auditTrail);
-			
+
 			reports.add(staReport);
 		}
 
