@@ -87,61 +87,70 @@ public class CallReportsPrint {
 
 	}
 
-	public static void designQuetionsandAnswers(Document document) {
+	public static void designQuetionsandAnswers(Document document) throws DocumentException {
 
-		Map<String, String> rationaleData = new LinkedHashMap<String, String>();
+		List<Question> questions = new ArrayList<Question>();
 
-		rationaleData.put("BI Rationale is for", "Account Type");
-		rationaleData.put(
+		addQuestionsToParagraph("BI Rationale is for", "Account Type", document);
+
+		questions.add(new Question(
 				"Did you consider the complexity of and risks associated with the recommended investment strategy, product, or account and discuss them with your client?",
-				"N/A");
-		rationaleData.put("Comments", "N/A");
-		rationaleData.put(
+				"N/A", "N/A"));
+
+		questions.add(new Question(
 				"Were the costs associated with all products in the recommendation considered, communicated, and explained to client?",
-				"N/A");
-		rationaleData.put("Comments", "N/A");
-		rationaleData.put(
+				"N/A", "N/A"));
+
+		questions.add(new Question(
 				"With consideration to past trading history, activity, and previous recommendations received by the client, does this recommendation (or series of recommendations) fit the best interest of the client?",
-				"N/A");
-		rationaleData.put("Comments", "N/A");
-		rationaleData.put(
+				"N/A", "N/A"));
+
+		questions.add(new Question(
 				"Did you review and compare reasonable alternatives and determine that the recommendation is in the best interest of the client?",
-				"N/A");
-		rationaleData.put("Comments", "N/A");
-		rationaleData.put(
+				"N/A", "N/A"));
+
+		questions.add(new Question(
 				"Did you consider the appropriateness of Account Type recommendation and how it fits the best interest of the client?",
-				"N/A");
-		rationaleData.put("Comments", "N/A");
+				"N/A", "N/A"));
 
-		rationaleData.put(
+		questions.add(new Question(
 				"Did you consider the appropriateness of the Product Type recommendation within the client's account type and how it fits the best interest of the client?",
-				"N/A");
-		rationaleData.put("Comments", "N/A");
+				"N/A", "N/A"));
 
-		rationaleData.put(
+		questions.add(new Question(
 				"Did you consider the appropriateness of the Product Type recommendation within the client's account type and how it fits the best interest of the client?",
-				"N/A");
-		rationaleData.put("Comments", "N/A");
+				"N/A", "N/A"));
 
-		rationaleData.put(
+		questions.add(new Question(
 				"How was this recommendation made for the best interest of the client and did the recommendation ensure that the firm or the representative's interests were not placed ahead of the customers?",
-				"N/A");
-		rationaleData.put(
-				"Received consent from the client/prospect to deliver Form CRS and HSBC Brokerage Brochure via Live Sign?",
-				"Physically Mailed");
-		rationaleData.put("How was the Form CRS/HBB delivered?", "N/A");
+				"N/A", "N/A"));
 
-		rationaleData.forEach((question, answer) -> {
+		questions.forEach((question) -> {
 			try {
-				addParagraph(FontFactory.HELVETICA_BOLD, (float) 10, BaseColor.BLACK, question, document,
-						Element.ALIGN_LEFT);
-				addParagraph(FontFactory.HELVETICA, (float) 10, BaseColor.BLACK, answer, document, Element.ALIGN_LEFT);
-
+				addQuestionsToParagraph(question.getQuestion(), question.getAnswer(), document);
+				addQuestionsToParagraph("Comments", question.getComments(), document);
 			} catch (DocumentException e) {
 				e.printStackTrace();
 			}
 
 		});
+
+		addQuestionsToParagraph(
+				"How was this recommendation made for the best interest of the client and did the recommendation ensure that the firm or the representative's interests were not placed ahead of the customers?",
+				"N/A", document);
+
+		addQuestionsToParagraph(
+				"Received consent from the client/prospect to deliver Form CRS and HSBC Brokerage Brochure via Live Sign?",
+				"Physically Mailed", document);
+
+		addQuestionsToParagraph("How was the Form CRS/HBB delivered?", "N/A", document);
+
+	}
+
+	public static void addQuestionsToParagraph(String question, String answer, Document document)
+			throws DocumentException {
+		addParagraph(FontFactory.HELVETICA_BOLD, (float) 10, BaseColor.BLACK, question, document, Element.ALIGN_LEFT);
+		addParagraph(FontFactory.HELVETICA, (float) 10, BaseColor.BLACK, answer, document, Element.ALIGN_LEFT);
 
 	}
 
